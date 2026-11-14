@@ -1,81 +1,83 @@
-import json,os,sys,urllib.request as u
-V=[0,100,320,330,500,900,20000]
-T="BBBBGLL.G=8BBBBVGGL[LLV`ttttBBBB!!$$!.BG$GLQ$BQV$GQV$BLQ!.BB!!$$.8888GBB8LLL8BLL8GGL8BGL8BBB.888BBBG=BBB=BBB=BBB=BBB=BBBGLLLBBBB.88=8BGB8GGGBBGG=BGG8BGG8BBB.88=V`LBVVBB8....$$!$!!!$!!!$!!!$!!!"
-KN=[33,31,-31,-33,18,14,-14,-18];BD=[17,15,-17,-15];RD=[16,1,-16,-1];KI=RD+BD
-B=[0]*128;S=1;C=0;E=-1;K=4;k=116;N=0;G=30000;Q=[s for s in range(128)if not s&136]
-def on(t):return 0<=t<128 and not t&136
+import json,os,urllib.request as u
+V=[0,100,320,330,500,900,9999]
+T="BBBBGLL.G=8BBBBVGGL[LLV`ttttBBBB!!$$!.BG$GLQ$BQV$GQV$BLQ!.BB!!$$.8888GBB8LLL8BLL8GGL8BGL8BBB.888BBBG=BBB=BBB=BBB=BBB=BBBGLLLBBBB.88=8BGB8GGGBBGG=BGG8BGG8BBB.88="
+P=[ord(c)-66 for c in T]
+KN=[33,31,-31,-33,18,14,-14,-18];BD=[17,15,-17,-15];RD=[16,1,-16,-1];KI=RD+BD;OF=(0,0,KN,BD,RD,BD+RD,KI)
+D={0:2,7:1,112:8,119:4}
+B=[0]*128;S=1;C=0;E=-1;K=4;k=116;N=0;G=50000;H=0;TT={}
+R=[];x=1
+for i in range(1665):x=x*1103515245+12345&2147483647;R+=[x]
+O=lambda t:not t&136
 def tu(u):
- f=(int(u[1])-1)*16+ord(u[0])-97;t=(int(u[3])-1)*16+ord(u[2])-97;pr=0
- if len(u)==5:pr='nbrq'.index(u[4])+2
- return f|t<<7|pr<<14
+ f=int(u[1])*16+ord(u[0])-113;t=int(u[3])*16+ord(u[2])-113
+ return f|t<<7|(('nbrq'.find(u[4])+2)<<14 if len(u)==5 else 0)
 def mk(m):
- global S,C,E,K,k
- sv=(B[:],S,C,E,K,k);f=m&127;t=(m>>7)&127;pr=m>>14;p=B[f]
- if abs(p)==1 and t==E and not B[t]:B[t-16*S]=0
- B[f]=0;B[t]=pr*S if pr else p
- if abs(p)==6 and abs(t-f)==2:
-  rf,rt=(f+3,f+1)if t>f else(f-4,f-1);r=B[rf];B[rf]=0;B[rt]=r
- if abs(p)==6:
-  if S>0:K=t
-  else:k=t
+ global S,C,E,K,k,H
+ sv=(B[:],S,C,E,K,k,H);f=m&127;t=(m>>7)&127;pr=m>>14;p=B[f];a=abs(p)
+ H^=R[(p+6)*128+f]
+ if B[t]:H^=R[(B[t]+6)*128+t]
+ if a==1 and t==E and not B[t]:H^=R[((-S)+6)*128+t-16*S];B[t-16*S]=0
+ B[f]=0;np=pr*S if pr else p;B[t]=np;H^=R[(np+6)*128+t]
+ if a==6 and abs(t-f)==2:
+  rf,rt=(f+3,f+1)if t>f else(f-4,f-1);r=B[rf];H^=R[(r+6)*128+rf];B[rf]=0;B[rt]=r;H^=R[(r+6)*128+rt]
+ if a==6:K,k=(t,k)if S>0 else(K,t)
  nc=C
- if abs(p)==6:nc&=12 if S>0 else 3
- for q,bb in((0,2),(7,1),(112,8),(119,4)):
-  if f==q or t==q:nc&=~bb
- C=nc;E=(f+t)//2 if abs(p)==1 and abs(t-f)==32 else -1;S=-S
+ if a==6:nc&=12 if S>0 else 3
+ nc&=~(D.get(f,0)|D.get(t,0))
+ C=nc;E=(f+t)//2 if a==1 and abs(t-f)==32 else -1;S=-S;H^=R[-1]
  return sv
 def uk(sv):
- global S,C,E,K,k
- B[:]=sv[0];S,C,E,K,k=sv[1:]
+ global S,C,E,K,k,H
+ B[:]=sv[0];S,C,E,K,k,H=sv[1:]
 def st(mv):
- global B,S,C,E,K,k
- A=[4,2,3,5,6,3,2,4];B=[0]*128
- for i in range(8):B[i]=A[i];B[i+16]=1;B[i+96]=-1;B[i+112]=-A[i]
- S=1;C=15;E=-1;K=4;k=116
+ global B,S,C,E,K,k,H
+ B=[0]*128
+ for i,c in enumerate('42356324'):B[i]=int(c);B[i+16]=1;B[i+96]=-1;B[i+112]=-int(c)
+ S=1;C=15;E=-1;K=4;k=116;H=547197312
  for x in mv:mk(tu(x))
 def ak(sq,by):
  for t in(sq-15*by,sq-17*by):
-  if on(t)and B[t]==by:return 1
- for O,p in((KN,2),(KI,6)):
-  for o in O:
+  if O(t)and B[t]==by:return 1
+ for D_,p,sl in((KN,2,0),(KI,6,0),(BD,3,1),(RD,4,1)):
+  for o in D_:
    t=sq+o
-   if on(t)and B[t]==by*p:return 1
- for O,p in((BD,3),(RD,4)):
-  for o in O:
-   t=sq+o
-   while on(t)and not B[t]:t+=o
-   if on(t)and(B[t]==by*p or B[t]==by*5):return 1
+   while O(t):
+    v=B[t]
+    if v:
+     if v==by*p or(sl and v==by*5):return 1
+     break
+    if not sl:break
+    t+=o
  return 0
 def gn(cp):
- m=[];d=16*S
- for f in Q:
+ m=[];d=16*S;r=7 if S>0 else 0;y=1 if S>0 else 6
+ for f in range(128):
   p=B[f]
   if not p or p*S<0:continue
   a=abs(p)
   if a==1:
-   t=f+d
-   if on(t)and not B[t]:
-    pr=(t>>4)==(7 if S>0 else 0);m.append((0,f|t<<7|(81920 if pr else 0)))
-    if not cp and not pr and(f>>4)==(1 if S>0 else 6):
-     x=f+2*d
-     if on(x)and not B[x]:m.append((0,f|x<<7))
-   for e in(d-1,d+1):
+   for e in(d-1,d,d+1):
     t=f+e
-    if not on(t):continue
-    v=B[t]
-    if v*S<0:m.append((10*V[abs(v)]-100,f|t<<7|(81920 if(t>>4)==(7 if S>0 else 0)else 0)))
+    if not O(t):continue
+    v=B[t];z=(t>>4)==r;q=z*81920
+    if e==d:
+     if v:continue
+     m.append((0,f|t<<7|q))
+     if not cp and not z and(f>>4)==y:
+      x=f+2*d
+      if O(x)and not B[x]:m.append((0,f|x<<7))
+    elif v*S<0:m.append((10*V[abs(v)]-100,f|t<<7|q))
     elif t==E:m.append((900,f|t<<7))
   else:
-   O=KN if a==2 else KI if a==6 else BD if a==3 else RD if a==4 else BD+RD;sl=a>2 and a!=6
-   for o in O:
+   D_=OF[a];sl=a>2 and a!=6
+   for o in D_:
     t=f+o
-    while on(t):
+    while O(t):
      v=B[t]
-     if not v:
-      if not cp:m.append((0,f|t<<7))
-     else:
+     if v:
       if v*S<0:m.append((10*V[abs(v)]-V[a],f|t<<7))
       break
+     if not cp:m.append((0,f|t<<7))
      if not sl:break
      t+=o
  if not cp:
@@ -84,56 +86,55 @@ def gn(cp):
  return m
 def ev():
  s=0
- for sq in Q:
+ for sq in range(128):
   p=B[sq]
   if p:
-   a=abs(p);r=sq>>4;f=min(sq&7,7-(sq&7));i=(r if p>0 else 7-r)*4+f;s+=(V[a]+ord(T[(a-1)*32+i])-66)*(1 if p>0 else -1)
+   a=abs(p);i=((sq>>4)if p>0 else 7-(sq>>4))*4+min(sq&7,7-(sq&7));s+=(V[a]+(P[(a-1)*32+i]if a<6 else 0))*(p//a)
  return s*S
 Ab=Exception
 def sr(d,a,b,pl):
  global N
  N+=1
  if N>G:raise Ab
+ e=TT.get(H)
+ if e and e[0]>=d:return e[1]
  if d<=0:
   if ak(K if S>0 else k,-S):mv=gn(0)
   else:
    s=ev()
    if s>=b:return b
+   if s+900<a:return a
    if s>a:a=s
    mv=gn(1)
  else:mv=gn(0)
- f=0
- for sc_,m in sorted(mv,reverse=True):
+ f=0;mv.sort(reverse=True)
+ for sc_,m in mv:
   sv=mk(m)
   if ak(K if S<0 else k,S):uk(sv);continue
   f=1;v=-sr(d-1,-b,-a,pl+1);uk(sv)
   if v>a:a=v
   if a>=b:break
- if not f:return(-20000+pl)if ak(K if S>0 else k,-S)else(0 if d>0 else a)
+ if not f:return(-9999+pl)if ak(K if S>0 else k,-S)else(0 if d>0 else a)
+ TT[H]=(d,a)
  return a
 def rt(lg):
  global N
  mv=[tu(x)for x in lg];best=mv[0]
  for d in range(1,10):
-  N=0;cur=best;bs=-999999
+  N=0;cur=best;bs=-9999
   try:
    for m in mv:
     sv=mk(m)
-    if ak(K if S<0 else k,S):uk(sv);continue
-    v=-sr(d-1,-999999,999999,1);uk(sv)
+    v=-sr(d-1,-9999,9999,1);uk(sv)
     if v>bs:bs=v;cur=m
    best=cur
   except Ab:break
- f=best&127;t=(best>>7)&127;pr=best>>14;s=chr(97+(f&7))+str((f>>4)+1)+chr(97+(t&7))+str((t>>4)+1)
- return s+('nbrq'[pr-2]if pr else '')
+ f=best&127;t=(best>>7)&127;pr=best>>14
+ return chr(97+f%8)+chr(49+f//16)+chr(97+t%8)+chr(49+t//16)+('nbrq'[pr-2]if pr else '')
 EN=os.environ["MAKEFUN_ENV_URL"]
-def po(p,b):
- q=u.Request(EN+p,data=json.dumps(b).encode())
- try:
-  with u.urlopen(q)as x:return json.load(x)
- except Exception:sys.exit(9)
+def po(p,b):return json.load(u.urlopen(u.Request(EN+p,data=json.dumps(b).encode())))
 while 1:
  g=po("/game",{})
  if"game"not in g:break
  while g["status"]=="your_move":
-  st(g["moves"]);g=po("/move",{"game":g["game"],"move":rt(g["legal_moves"])})
+  st(g["moves"]);g=po("/move",dict(game=g["game"],move=rt(g["legal_moves"])))
