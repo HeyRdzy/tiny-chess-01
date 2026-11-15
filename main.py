@@ -4,7 +4,7 @@ T="BBBBGLL.G=8BBBBVGGL[LLV`ttttBBBB!!$$!.BG$GLQ$BQV$GQV$BLQ!.BB!!$$.8888GBB8LLL8
 P=[ord(c)-66 for c in T]
 KN=[33,31,-31,-33,18,14,-14,-18];BD=[17,15,-17,-15];RD=[16,1,-16,-1];KI=RD+BD;OF=(0,0,KN,BD,RD,BD+RD,KI)
 D={0:2,7:1,112:8,119:4}
-B=[0]*128;S=1;C=0;E=-1;K=4;k=116;N=0;G=50000;H=0;TT={}
+B=[0]*128;S=1;C=0;E=-1;K=4;k=116;N=0;G=150000;H=0;TT={}
 R=[];x=1
 for i in range(1665):x=x*1103515245+12345&2147483647;R+=[x]
 O=lambda t:not t&136
