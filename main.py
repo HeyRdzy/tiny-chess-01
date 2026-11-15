@@ -1,10 +1,10 @@
 import json,os,urllib.request as u
 V=[0,100,320,330,500,900,9999]
-T="BBBBGLL.G=8BBBBVGGL[LLV`ttttBBBB!!$$!.BG$GLQ$BQV$GQV$BLQ!.BB!!$$.8888GBB8LLL8BLL8GGL8BGL8BBB.888BBBG=BBB=BBB=BBB=BBB=BBBGLLLBBBB.88=8BGB8GGGBBGG=BGG8BGG8BBB.88="
+T="BBBBGLL.G=8BBBBVGGL[LLV`ttttBBBB!!$$!.BG$GLQ$BQV$GQV$BLQ!.BB!!$$.8888GBB8LLL8BLL8GGL8BGL8BBB.888BBBG=BBB=BBB=BBB=BBB=BBBGLLLBBBB"
 P=[ord(c)-66 for c in T]
 KN=[33,31,-31,-33,18,14,-14,-18];BD=[17,15,-17,-15];RD=[16,1,-16,-1];KI=RD+BD;OF=(0,0,KN,BD,RD,BD+RD,KI)
 D={0:2,7:1,112:8,119:4}
-B=[0]*128;S=1;C=0;E=-1;K=4;k=116;N=0;G=150000;H=0;TT={}
+B=[0]*128;S=1;C=0;E=-1;K=4;k=116;N=0;G=50000;H=0;TT={}
 R=[];x=1
 for i in range(1665):x=x*1103515245+12345&2147483647;R+=[x]
 O=lambda t:not t&136
@@ -89,7 +89,7 @@ def ev():
  for sq in range(128):
   p=B[sq]
   if p:
-   a=abs(p);i=((sq>>4)if p>0 else 7-(sq>>4))*4+min(sq&7,7-(sq&7));s+=(V[a]+(P[(a-1)*32+i]if a<6 else 0))*(p//a)
+   a=abs(p);i=((sq>>4)if p>0 else 7-(sq>>4))*4+min(sq&7,7-(sq&7));s+=(V[a]+(P[(a-1)*32+i]if a<5 else 0))*(p//a)
  return s*S
 Ab=Exception
 def sr(d,a,b,pl):
@@ -97,7 +97,6 @@ def sr(d,a,b,pl):
  N+=1
  if N>G:raise Ab
  e=TT.get(H)
- if e and e[0]>=d:return e[1]
  if d<=0:
   if ak(K if S>0 else k,-S):mv=gn(0)
   else:
@@ -106,16 +105,18 @@ def sr(d,a,b,pl):
    if s+900<a:return a
    if s>a:a=s
    mv=gn(1)
- else:mv=gn(0)
- f=0;mv.sort(reverse=True)
+ else:
+  mv=gn(0)
+  if e:mv=[(99999 if m==e else s,m)for s,m in mv]
+ f=0;bm=0;mv.sort(reverse=True)
  for sc_,m in mv:
   sv=mk(m)
   if ak(K if S<0 else k,S):uk(sv);continue
   f=1;v=-sr(d-1,-b,-a,pl+1);uk(sv)
-  if v>a:a=v
+  if v>a:a=v;bm=m
   if a>=b:break
  if not f:return(-9999+pl)if ak(K if S>0 else k,-S)else(0 if d>0 else a)
- TT[H]=(d,a)
+ if bm:TT[H]=bm
  return a
 def rt(lg):
  global N
